@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loja Moda Íntima & Roupas</title>
+
+<style>
+body {font-family: Arial;margin:0;background:#fff;}
+
+header {background:#fff;border-bottom:1px solid #eee;padding:10px;display:flex;flex-direction:column;gap:10px;}
+header h1 {color:#ff2e63;font-size:20px;margin:0;text-align:center;}
+
+/* busca */
+#busca {padding:8px;border:1px solid #ddd;border-radius:5px;width:100%;}
+
+nav {display:flex;justify-content:center;gap:10px;font-size:14px;}
+nav a {text-decoration:none;color:#333;cursor:pointer;}
+
+.banner {background:#222;color:#fff;text-align:center;padding:15px;font-weight:bold;}
+
+.container {padding:10px;}
+
+.produtos {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.produto {border:1px solid #eee;border-radius:10px;overflow:hidden;transition:0.3s;}
+
+.produto:hover {transform:scale(1.03);}
+
+.produto img {width:100%;height:180px;object-fit:cover;}
+
+.produto-info {padding:8px;font-size:14px;}
+
+.preco {color:#ff2e63;font-weight:bold;}
+
+select {width:100%;margin-top:5px;padding:5px;}
+
+button {width:100%;padding:8px;border:none;background:#000;color:#fff;margin-top:5px;cursor:pointer;}
+
+#btnCarrinho {position:fixed;bottom:15px;right:15px;background:#ff2e63;color:white;padding:12px;border-radius:50%;font-size:18px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.3);} 
+
+#contadorCarrinho {position:absolute;top:-5px;right:-5px;background:red;color:#fff;font-size:12px;border-radius:50%;padding:3px 6px;}
+
+#carrinho {position:fixed;right:-320px;top:0;width:300px;height:100%;background:#fff;border-left:1px solid #ddd;padding:10px;transition:.3s;}
+#carrinho.ativo{right:0;}
+
+.item-carrinho{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+
+.btn-whatsapp{background:#25D366;margin-top:10px;}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Loja Moda Íntima & Roupas</h1>
+  <input type="text" id="busca" placeholder="Buscar produto..." onkeyup="buscar()">
+  <nav>
+    <a onclick="filtrar('todos')">Todos</a>
+    <a onclick="filtrar('feminino')">Feminino</a>
+    <a onclick="filtrar('masculino')">Masculino</a>
+  </nav>
+</header>
+
+<div class="banner">🔥 PROMOÇÕES DE HOJE 🔥</div>
+
+<div class="container">
+
+<div class="produtos" id="produtos">
+
+<div class="produto" data-cat="feminino">
+<img src="legging-preta.jpg">
+<div class="produto-info">
+<p>Legging Preta Premium</p>
+<p class="preco">R$ 29.99</p>
+<select id="tam1"><option>P</option><option>M</option><option>G</option><option>GG</option></select>
+<select id="cor1"><option>Preto</option></select>
+<button onclick="add('Legging Preta Premium',29.99,'tam1','cor1')">Adicionar</button>
+</div>
+</div>
+
+<div class="produto" data-cat="feminino">
+<img src="legging-marmorizada.jpg">
+<div class="produto-info">
+<p>Legging Marmorizada Fitness</p>
+<p class="preco">R$ 39.99</p>
+<select id="tam2"><option>P</option><option>M</option><option>G</option><option>GG</option></select>
+<select id="cor2"><option>Preta</option><option>Branca</option><option>Rosa</option><option>Roxa</option><option>Cinza</option></select>
+<button onclick="add('Legging Marmorizada Fitness',39.99,'tam2','cor2')">Adicionar</button>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id="btnCarrinho" onclick="toggleCarrinho()">🛒<span id="contadorCarrinho">0</span></div>
+
+<div id="carrinho">
+<h3>Seu Carrinho</h3>
+<div id="lista"></div>
+<p>Total: R$ <span id="total">0</span></p>
+<button class="btn-whatsapp" onclick="finalizar()">Comprar</button>
+</div>
+
+<script>
+let carrinho=[];
+
+function add(nome,preco,tamId,corId){
+let tam=document.getElementById(tamId).value;
+let cor=document.getElementById(corId).value;
+carrinho.push({nome,preco,tam,cor});
+render();
+}
+
+function render(){
+let contador = carrinho.length;
+ document.getElementById('contadorCarrinho').innerText = contador;
+let html='';
+let total=0;
+
+carrinho.forEach((i,index)=>{
+total+=i.preco;
+html+=`<div class='item-carrinho'>${i.nome} (${i.tam}/${i.cor}) <span onclick="remover(${index})">❌</span></div>`;
+});
+
+document.getElementById('lista').innerHTML=html;
+document.getElementById('total').innerText=total.toFixed(2);
+}
+
+function remover(i){carrinho.splice(i,1);render();}
+
+function toggleCarrinho(){document.getElementById('carrinho').classList.toggle('ativo');}
+
+function finalizar(){
+let msg='Olá! Quero comprar:%0A';
+
+carrinho.forEach(i=>{
+msg+=`- ${i.nome} (${i.tam}/${i.cor}) R$ ${i.preco}%0A`;
+});
+
+msg+=`Total: R$ ${document.getElementById('total').innerText}`;
+
+window.open(`https://wa.me/5512996349363?text=${msg}`,'_blank');
+}
+
+function filtrar(cat){
+let p=document.querySelectorAll('.produto');
+p.forEach(el=>{
+el.style.display=(cat==='todos'||el.dataset.cat===cat)?'block':'none';
+});
+}
+
+function buscar(){
+let termo=document.getElementById('busca').value.toLowerCase();
+let p=document.querySelectorAll('.produto');
+
+p.forEach(el=>{
+let nome=el.innerText.toLowerCase();
+el.style.display=nome.includes(termo)?'block':'none';
+});
+}
+</script>
+
+</body>
+</html>
